@@ -13,5 +13,7 @@ namespace RedditAlerts.Models
         public List<string> SubReddits { get; set; } = new();
         [JsonPropertyName("KeyWords")]
         public List<string> KeyWords { get; set; } = new();
+        [JsonPropertyName("SentPosts")]
+        public List<DigestedRedditPost> SentPosts { get; set; } = new();
     }
 }

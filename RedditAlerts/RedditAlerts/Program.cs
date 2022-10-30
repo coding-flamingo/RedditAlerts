@@ -11,6 +11,7 @@ public class Program
     {
         Console.WriteLine("Hello, Reddit!");
         RedditManager redditManager;
+        string teamsURL = string.Empty;
         if(args.Length == 1)
         {
             KeyVaultSecretService akv = new(args[0]);
@@ -18,6 +19,7 @@ public class Program
             string appUserName = await akv.GetKeyVaultSecretAsync("RedditAppUser");
             string appPassword = await akv.GetKeyVaultSecretAsync("RedditAppPassword");
             string appRefreshToken = await akv.GetKeyVaultSecretAsync("RedditAppRefreshToken");
+            teamsURL = await akv.GetKeyVaultSecretAsync("TeamsURL");
             redditManager = new (appUserName, appPassword, appRefreshToken);
         }
         else
@@ -31,9 +33,19 @@ public class Program
         foreach(var sub in settings.SubReddits)
         {
             posts.AddRange(
-                redditManager.GetLastHoursPosts(sub));
+                redditManager.GetLastHoursFilteredPosts(sub, settings.KeyWords));
         }
-
+        //Send Messages to Teams
+        if(!string.IsNullOrWhiteSpace(teamsURL))
+        {
+            TeamsManager teamsManager = new(new(new()), teamsURL);
+            await teamsManager.SendNewPostsToTeamsAsync(settings.SentPosts, 
+                posts);
+        }
+        //Save Settings
+        settings.SentPosts = settings.SentPosts.Where(i => i.PostedDate 
+            > DateTime.Now.AddMinutes(-100)).ToList();
+        SettingsManager.SaveSettings(settings);
         Console.WriteLine("done :)");
     }
 }

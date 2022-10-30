@@ -83,6 +83,47 @@ namespace RedditAlerts.Managers
             return posts;
         }
 
+        public List<DigestedRedditPost> GetLastHoursFilteredPosts(string subReddit,
+            List<string> keywords, string? after = "")
+        {
+            List<DigestedRedditPost> digestedRedditPosts = new();
+            List<Post> posts = _redditClient.Subreddit
+                (subReddit).Posts.GetNew(new
+                CategorizedSrListingInput(after: after, limit: 100));
+            int postsAfterHour = 0; // sometimes Reddit time travels so we give them 3 strikes
+            foreach (Post post in posts)
+            {
+                if (post.Created < DateTime.Now.AddHours(-1))
+                {
+                    postsAfterHour += 1;
+                    if (postsAfterHour > 3)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if(keywords.Any(i => post.Title.Contains(i,
+                        StringComparison.OrdinalIgnoreCase)) 
+                        || (string.IsNullOrWhiteSpace(
+                            post.Listing.SelfText) == false
+                            && keywords.Any(i =>
+                            post.Listing.SelfText.Contains(i, 
+                            StringComparison.OrdinalIgnoreCase))))
+                    {
+                        digestedRedditPosts.Add(new(post));
+                    }
+                }
+            }
+            if (posts.Count == 100
+                && posts.Last().Created > DateTime.Now.AddHours(-1))
+            {
+                digestedRedditPosts.AddRange(
+                    GetLastHoursPosts(subReddit, posts.Last().Fullname));
+            }
+            return digestedRedditPosts;
+        }
+
         public List<DigestedRedditPost> GetLastHoursPosts(string subReddit,
             string? after = "")
         {

@@ -22,12 +22,18 @@ namespace RedditAlerts.Models
             Content = post.Listing.SelfText;
             SubReddit = post.Subreddit;
             PostedDate = post.Created;
+            if(!string.IsNullOrWhiteSpace(post.Listing.URL))
+            {
+                ImageURL = post.Listing.URL;
+            }
         }
 
         [JsonPropertyName("Title")]
         public string Title { get; set; } = string.Empty;
         [JsonPropertyName("URL")]
         public string URL { get; set; } = string.Empty;
+        [JsonPropertyName("ImageURL")]
+        public string ImageURL { get; set; } = string.Empty;
         [JsonPropertyName("Content")]
         public string Content { get; set; } = string.Empty;
         [JsonPropertyName("SubReddit")]

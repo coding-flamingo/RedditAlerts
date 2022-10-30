@@ -22,14 +22,19 @@ public static class SettingsManager
             Console.WriteLine("No settings found, creating default settings");
             settingsObj.KeyWords.Add("GME");
             settingsObj.SubReddits.Add("wallstreetbets");
-            settingsStr = JsonSerializer.Serialize(settingsObj);
-            FileService.WriteToFile("RedditAlets\\settings.json",
-                settingsStr);
+            SaveSettings(settingsObj);
         }
         else
         {
             settingsObj = JsonSerializer.Deserialize<SettingsModel>(settingsStr) ?? new();
         }
         return settingsObj;
+    }
+
+    public static void SaveSettings(SettingsModel settingsObj)
+    {
+        string settingsStr = JsonSerializer.Serialize(settingsObj);
+        FileService.WriteToFile("RedditAlets\\settings.json",
+            settingsStr);
     }
 }
