@@ -22,6 +22,11 @@ namespace RedditAlerts.Managers
             _redditClient = AuthorizeUser(appID, appSecret); 
         }
 
+        public RedditManager(string appID, string appSecret, string refreshToken)
+        {
+            _redditClient = new(appID, refreshToken, appSecret);
+        }
+
         public RedditClient AuthorizeUser(string appId, string appSecret, int port = 8080)
         {
             AuthTokenRetrieverLib authTokenRetrieverLib = new (appId, port, "localhost",
@@ -38,7 +43,7 @@ namespace RedditAlerts.Managers
             }
             authTokenRetrieverLib.StopListening();
             return new(appId, authTokenRetrieverLib.RefreshToken, appSecret,
-                authTokenRetrieverLib.AccessToken); ;
+                authTokenRetrieverLib.AccessToken);
         }
 
         private static void OpenBrowser(string authUrl, string browserPath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
@@ -85,7 +90,7 @@ namespace RedditAlerts.Managers
             List<Post> posts = _redditClient.Subreddit
                 (subReddit).Posts.GetNew(new 
                 CategorizedSrListingInput(after: after, limit: 100));
-            int postsAfterHour = 0; // sometimes reddit time travels so we give them 3 strikes
+            int postsAfterHour = 0; // sometimes Reddit time travels so we give them 3 strikes
             foreach(Post post in posts)
             {
                 if(post.Created < DateTime.Now.AddHours(-1))

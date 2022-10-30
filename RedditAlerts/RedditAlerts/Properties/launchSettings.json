@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RedditAlerts": {
+      "commandName": "Project",
+      "commandLineArgs": "https://akv-centraluse1ea999.vault.azure.net/"
+    }
+  }
+}
