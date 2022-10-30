@@ -13,9 +13,13 @@ public static class SettingsManager
 {
     public static SettingsModel GettSettings()
     {
-        System.IO.Directory.CreateDirectory("RedditAlets");
+        System.IO.Directory.CreateDirectory(Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData) +
+                    "\\RedditAlets");
         string settingsStr = FileService.GetFullFile(
-            "RedditAlets\\settings.json");
+           Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData)+
+                    "\\RedditAlets\\settings.json");
         SettingsModel settingsObj = new ();
         if(string.IsNullOrWhiteSpace(settingsStr))
         {
@@ -34,7 +38,10 @@ public static class SettingsManager
     public static void SaveSettings(SettingsModel settingsObj)
     {
         string settingsStr = JsonSerializer.Serialize(settingsObj);
-        FileService.WriteToFile("RedditAlets\\settings.json",
+        FileService.WriteToFile(
+            Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData) +
+                    "\\RedditAlets\\settings.json",
             settingsStr);
     }
 }
